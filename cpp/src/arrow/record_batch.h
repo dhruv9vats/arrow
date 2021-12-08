@@ -211,7 +211,7 @@ class ARROW_EXPORT RecordBatch {
 };
 
 /// \brief Abstract interface for reading stream of record batches
-class ARROW_EXPORT RecordBatchReader {
+class ARROW_EXPORT RecordBatchReader : std::enable_shared_from_this<RecordBatchReader> {
  public:
   using ValueType = std::shared_ptr<RecordBatch>;
 
@@ -233,6 +233,51 @@ class ARROW_EXPORT RecordBatchReader {
     ARROW_RETURN_NOT_OK(ReadNext(&batch));
     return batch;
   }
+
+  class RecordBatchReaderIterator {
+   public:
+    RecordBatchReaderIterator() : batch_(std::shared_ptr<RecordBatch>(NULLPTR)) {}
+
+    explicit RecordBatchReaderIterator(std::shared_ptr<RecordBatchReader> reader)
+        : reader_(std::move(reader)), batch_(std::shared_ptr<RecordBatch>(NULLPTR)) {
+      Next();
+    }
+
+    bool operator!=(const RecordBatchReaderIterator& other) const {
+      return batch_ != other.batch_;
+    }
+
+    Result<std::shared_ptr<RecordBatch>> operator*() {
+      ARROW_RETURN_NOT_OK(batch_.status());
+
+      auto batch = std::move(batch_);
+      batch_ = std::shared_ptr<RecordBatch>(NULLPTR);
+      return batch;
+    }
+
+    RecordBatchReaderIterator& operator++() {
+      Next();
+      return *this;
+    }
+
+   private:
+    void Next() {
+      if (!batch_.ok()) {
+        batch_ = std::shared_ptr<RecordBatch>(NULLPTR);
+        return;
+      }
+      batch_ = reader_->Next();
+    }
+
+    Result<std::shared_ptr<RecordBatch>> batch_;
+    std::shared_ptr<RecordBatchReader> reader_;
+  };
+
+  RecordBatchReaderIterator begin() {
+    return RecordBatchReaderIterator(std::move(shared_from_this()));
+  }
+
+  RecordBatchReaderIterator end() { return RecordBatchReaderIterator(); }
 
   /// \brief Consume entire stream as a vector of record batches
   Status ReadAll(RecordBatchVector* batches);
