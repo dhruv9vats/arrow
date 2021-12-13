@@ -211,7 +211,7 @@ class ARROW_EXPORT RecordBatch {
 };
 
 /// \brief Abstract interface for reading stream of record batches
-class ARROW_EXPORT RecordBatchReader : std::enable_shared_from_this<RecordBatchReader> {
+class ARROW_EXPORT RecordBatchReader {
  public:
   using ValueType = std::shared_ptr<RecordBatch>;
 
@@ -236,10 +236,10 @@ class ARROW_EXPORT RecordBatchReader : std::enable_shared_from_this<RecordBatchR
 
   class RecordBatchReaderIterator {
    public:
-    RecordBatchReaderIterator() : batch_(std::shared_ptr<RecordBatch>(NULLPTR)) {}
+    RecordBatchReaderIterator() : batch_(RecordBatchEnd()) {}
 
-    explicit RecordBatchReaderIterator(std::shared_ptr<RecordBatchReader> reader)
-        : reader_(std::move(reader)), batch_(std::shared_ptr<RecordBatch>(NULLPTR)) {
+    explicit RecordBatchReaderIterator(RecordBatchReader* reader)
+        : batch_(RecordBatchEnd()), reader_(reader) {
       Next();
     }
 
@@ -251,7 +251,7 @@ class ARROW_EXPORT RecordBatchReader : std::enable_shared_from_this<RecordBatchR
       ARROW_RETURN_NOT_OK(batch_.status());
 
       auto batch = std::move(batch_);
-      batch_ = std::shared_ptr<RecordBatch>(NULLPTR);
+      batch_ = RecordBatchEnd();
       return batch;
     }
 
@@ -261,21 +261,23 @@ class ARROW_EXPORT RecordBatchReader : std::enable_shared_from_this<RecordBatchR
     }
 
    private:
+    std::shared_ptr<RecordBatch> RecordBatchEnd() {
+      return std::shared_ptr<RecordBatch>(NULLPTR);
+    }
+
     void Next() {
       if (!batch_.ok()) {
-        batch_ = std::shared_ptr<RecordBatch>(NULLPTR);
+        batch_ = RecordBatchEnd();
         return;
       }
       batch_ = reader_->Next();
     }
 
     Result<std::shared_ptr<RecordBatch>> batch_;
-    std::shared_ptr<RecordBatchReader> reader_;
+    RecordBatchReader* reader_;
   };
 
-  RecordBatchReaderIterator begin() {
-    return RecordBatchReaderIterator(std::move(shared_from_this()));
-  }
+  RecordBatchReaderIterator begin() { return RecordBatchReaderIterator(this); }
 
   RecordBatchReaderIterator end() { return RecordBatchReaderIterator(); }
 
