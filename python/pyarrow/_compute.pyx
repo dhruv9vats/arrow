@@ -1352,10 +1352,12 @@ cdef class _MapArrayLookupOptions(FunctionOptions):
             _raise_invalid_function_option(occurrence,
                                            "Should either be FIRST, LAST or ALL")
 
+
 class MapArrayLookupOptions(_MapArrayLookupOptions):
 
     def __init__(self, scalar, occurrence):
         self._set_options(scalar, occurrence)
+
 
 cdef class _ModeOptions(FunctionOptions):
     def _set_options(self, n, skip_nulls, min_count):

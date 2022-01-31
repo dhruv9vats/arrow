@@ -2473,14 +2473,21 @@ def test_make_struct():
 
 def test_map_array_lookup():
     ty = pa.map_(pa.utf8(), pa.int32())
-    arr = pa.array([[('one', 1), ('two', 2)], [('none', 3)], [], [('one', 5), ('one', 7)], None], type=ty)
+    arr = pa.array([[('one', 1), ('two', 2)], [('none', 3)],
+                    [], [('one', 5), ('one', 7)], None], type=ty)
     result_first = pa.array([1, None, None, 5, None], type=pa.int32())
     result_last = pa.array([1, None, None, 7, None], type=pa.int32())
-    result_all = pa.array([[1], None, None, [5, 7], None], type=pa.list_(pa.int32()))
+    result_all = pa.array([[1], None, None, [5, 7], None],
+                          type=pa.list_(pa.int32()))
 
-    assert pc.map_array_lookup(arr, pa.scalar('one', type=pa.utf8()), 'FIRST') == result_first
-    assert pc.map_array_lookup(arr, pa.scalar('one', type=pa.utf8()), 'LAST') == result_last
-    assert pc.map_array_lookup(arr, pa.scalar('one', type=pa.utf8()), 'ALL') == result_all
+    assert pc.map_array_lookup(arr, pa.scalar(
+        'one', type=pa.utf8()), 'FIRST') == result_first
+    assert pc.map_array_lookup(arr, pa.scalar(
+        'one', type=pa.utf8()), 'LAST') == result_last
+    assert pc.map_array_lookup(arr, pa.scalar(
+        'one', type=pa.utf8()), 'ALL') == result_all
+    assert pc.map_array_lookup(arr, pa.scalar(
+        'one', type=pa.utf8())) == result_all
 
 
 def test_struct_fields_options():
