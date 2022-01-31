@@ -2157,7 +2157,6 @@ cdef extern from "arrow/compute/api.h" namespace "arrow::compute" nogil:
             "arrow::compute::MapArrayLookupOptions"(CFunctionOptions):
         CMapArrayLookupOptions(shared_ptr[CScalar] query_key,
                                CMapArrayLookupOccurrence occurrence)
-        CMapArrayLookupOptions(shared_ptr[CScalar] query_key)
         CMapArrayLookupOccurrence occurrence
         shared_ptr[CScalar] query_key
 

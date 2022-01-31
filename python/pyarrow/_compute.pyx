@@ -1352,11 +1352,6 @@ cdef class _MapArrayLookupOptions(FunctionOptions):
             _raise_invalid_function_option(occurrence,
                                            "Should either be FIRST, LAST or ALL")
 
-    def _set_options(self, scalar):
-        self.wrapped.reset(
-            new CMapArrayLookupOptions(pyarrow_unwrap_scalar(scalar))
-        )
-
 
 class MapArrayLookupOptions(_MapArrayLookupOptions):
 
