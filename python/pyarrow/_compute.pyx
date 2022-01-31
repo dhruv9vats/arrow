@@ -1354,6 +1354,17 @@ cdef class _MapArrayLookupOptions(FunctionOptions):
 
 
 class MapArrayLookupOptions(_MapArrayLookupOptions):
+    """
+    Options for the `map_array_lookup` function.
+
+    Parameters
+    ----------
+    query_key : Scalar
+        The key to search for.
+    occurrence : str
+        The occurrence(s) to return from the MapArray
+        Accepted values are "FIRST", "LAST", "ALL".
+    """
 
     def __init__(self, scalar, occurrence):
         self._set_options(scalar, occurrence)

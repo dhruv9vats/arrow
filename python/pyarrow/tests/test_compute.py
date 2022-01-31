@@ -2486,8 +2486,6 @@ def test_map_array_lookup():
         'one', type=pa.utf8()), 'LAST') == result_last
     assert pc.map_array_lookup(arr, pa.scalar(
         'one', type=pa.utf8()), 'ALL') == result_all
-    assert pc.map_array_lookup(arr, pa.scalar(
-        'one', type=pa.utf8())) == result_all
 
 
 def test_struct_fields_options():
