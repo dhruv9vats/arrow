@@ -141,6 +141,7 @@ def test_option_class_equality():
                              field_nullability=[True, True],
                              field_metadata=[pa.KeyValueMetadata({"a": "1"}),
                                              pa.KeyValueMetadata({"b": "2"})]),
+        pc.MapArrayLookupOptions(pa.scalar(1), "FIRST"),
         pc.MatchSubstringOptions("pattern"),
         pc.ModeOptions(),
         pc.NullOptions(),
