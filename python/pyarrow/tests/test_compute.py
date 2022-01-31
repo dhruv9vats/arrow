@@ -2461,7 +2461,7 @@ def test_make_struct():
     assert pc.make_struct([1, 2, 3],
                           "a b c".split()) == pa.StructArray.from_arrays([
                               [1, 2, 3],
-                              "a b c".split()], names='0 1'.split())
+        "a b c".split()], names='0 1'.split())
 
     with pytest.raises(ValueError,
                        match="Array arguments must all be the same length"):
@@ -2469,6 +2469,15 @@ def test_make_struct():
 
     with pytest.raises(ValueError, match="0 arguments but 2 field names"):
         pc.make_struct(field_names=['one', 'two'])
+
+
+def test_map_array_lookup():
+    ty = pa.map_(pa.utf8(), pa.int32())
+    ty_values = pa.struct([pa.field("key", pa.utf8(), nullable=False),
+                           pa.field("value", pa.int32())])
+    arr = pa.array([[('one', 1), ('two', 2)], [('none', 3)], [], [('one', 5), ('one', 7)], None], type=ty)
+    result = pa.array([1, None, None, 5, None], type=pa.int32())
+    assert pc.map_array_lookup(arr, pa.scalar('one', type=pa.utf8()), 'FIRST') == result
 
 
 def test_struct_fields_options():
